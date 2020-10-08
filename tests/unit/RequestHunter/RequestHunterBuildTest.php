@@ -180,42 +180,172 @@ class RequestHunterBuildTest extends TestCase
     
     public function testSetDefaultData()
     {
-        $this->assertTrue(false);
+        $method = 'GET';
+        $route = '/test/path';
+        $remoteAddr = 'testtest';
+        
+        $_SERVER['REMOTE_ADDR'] = $remoteAddr;
+        $_SERVER['PATH_INFO'] = $route;
+        $_SERVER['REQUEST_METHOD'] = $method;
+        
+        $file = $this->dir_root . 'storage/rh/testWriteFile.php';
+        $data = [
+            $method => [
+                $route => ['count' => 1]
+            ]
+        ];
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $sut->setFile($file);
+        $sut->setDefaultData($method, $route);
+        $result = $sut->read();
+        
+        $this->assertTrue($result === $data);
+        
+        $this->rmAll($file);
     }
     
-    //FileRequestHunterBase 
+    //FileRequestHunterBase  
     public function testRead()
     {
-        $this->assertTrue(false);
+        $file = $this->dir_root . 'storage/rh/testWriteFile.php';
+        $data = ['testKey' => 'testValue'];
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $sut->setFile($file);
+        $sut->write($data);
+        $result = $sut->read();
+        
+        $this->assertTrue($result === $data);
+        
+        $this->rmAll($file);
     }
     
     public function testWrite()
     {
-        $this->assertTrue(false);
+        $file = $this->dir_root . 'storage/rh/testWriteFile.php';
+        $data = ['testKey' => 'testValue'];
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $sut->setFile($file);
+        $sut->write($data);
+        
+        $result = json_decode(file_get_contents($file), true);
+        
+        $this->assertTrue($result === $data);
+        
+        $this->rmAll($file);
     }
     
-        public function testCreateFile()
+    public function testCreateFile()
     {
-        $this->assertTrue(false);
+        $file = $this->dir_root . 'storage/rh/testWriteFile.php';
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $sut->setFile($file);
+        $sut->createFile();
+        
+        $result = json_decode(file_get_contents($file), true);
+        
+        $this->assertTrue($result === []);
+        
+        $this->rmAll($file);
     }
     
     public function testCreateDir()
     {
-        $this->assertTrue(false);
+        $_SERVER['REMOTE_ADDR'] = 'testtest';
+        $_SERVER['PATH_INFO'] = '/test/path';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $path = $sut->makeDirPath($_SERVER['REMOTE_ADDR']);
+        $sut->createDir($path);
+        
+        $this->assertTrue(file_exists($path));
+
+        $this->rmAll($path);
     }
     
-    public function testGetCount()
+    public function testCreateDirWhenAlreadyExist()
     {
-        $this->assertTrue(false);
+        $_SERVER['REMOTE_ADDR'] = 'testtest';
+        $_SERVER['PATH_INFO'] = '/test/path';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+        
+        $path = $sut->makeDirPath($_SERVER['REMOTE_ADDR']);
+        $sut->createDir($path);
+        
+        $this->expectException('GuzzleHttp\Exception\ClientException');
+        $sut->createDir($path);
+
+        $this->rmAll($path);
     }
     
     public function testMakeFileName()
     {
-        $this->assertTrue(false);
+        $_SERVER['REMOTE_ADDR'] = 'testtest';
+        $_SERVER['PATH_INFO'] = '/test/path';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+
+       
+        $file = $this->makeFileName('remote_addr');
+        $customFile = "./storage/rh/" . date('Ymd') . '/remote_addr/statistics.php';
+        $this->assertTrue($file === $customFile);
     }
     
     public function testMakeDirPath()
     {
-        $this->assertTrue(false);
+        $_SERVER['REMOTE_ADDR'] = 'testtest';
+        $_SERVER['PATH_INFO'] = '/test/path';
+        $_SERVER['REQUEST_METHOD'] = 'GET';
+
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
+            ->path($this->dir_root . 'storage/rh')
+            ->build();
+
+       
+        $dir = $this->makeDirPath('remote_addr');
+        $customDir = "./storage/rh/" . date('Ymd') . '/remote_addr';
+        $this->assertTrue($dir === $customDir);
     }
 }
