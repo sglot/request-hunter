@@ -33,7 +33,7 @@ class RequestHunterBuildTest extends TestCase
         $this->assertTrue(is_subclass_of($sut, RequestHunterInterface::class));
     }
 
-    public function testReturnRightClassForServer()
+    public function testReturnRightClassForFileDriverServerType()
     {
         $sut = $this->factory
             ->driver(DriverRequestHunterFactory::FILE_DRIVER)
@@ -44,7 +44,7 @@ class RequestHunterBuildTest extends TestCase
         $this->assertTrue(is_a($sut, FileServerRequestHunter::class));
     }
 
-    public function testReturnRightClassForRequest()
+    public function testReturnRightClassForFileDriverRequestType()
     {
         $sut = $this->factory
             ->driver(DriverRequestHunterFactory::FILE_DRIVER)
@@ -55,6 +55,14 @@ class RequestHunterBuildTest extends TestCase
         $this->assertTrue(is_a($sut, FileRequestHunter::class));
     }
 
+    public function testReturnRightClassForNotExistDriver()
+    {
+        $sut = $this->factory
+            ->driver('not existing driver');
+
+        $this->assertTrue(is_a($sut, NullTypeFactory::class));
+    }
+    
     public function testReturnRightClassForNotExistType()
     {
         $sut = $this->factory
@@ -75,7 +83,7 @@ class RequestHunterBuildTest extends TestCase
         $this->assertTrue($sut->getPath() == "/dir/to/storage");
     }
 
-    public function testServerTypeCount()
+    public function testFileServerOneTypeCounter()
     {
         $_SERVER['REMOTE_ADDR'] = 'testtest';
         $_SERVER['PATH_INFO'] = '/test/path';
@@ -96,7 +104,7 @@ class RequestHunterBuildTest extends TestCase
         $this->rmAll($sut->makeDirPath('testtest'));
     }
 
-    public function testServerDifferentType()
+    public function testFileServerDifferentTypeCounter()
     {
         $_SERVER['REMOTE_ADDR'] = 'testtest';
         $_SERVER['PATH_INFO'] = '/test/path';
@@ -133,5 +141,81 @@ class RequestHunterBuildTest extends TestCase
             return rmdir($path);
         }
         return false;
+    }
+    
+    //FileServerRequestHunter 
+    
+    public function testFileServerRequestHunterBuildCorrectlySetProperties()
+    {
+        $method = 'GET';
+        $route = '/test/path';
+        $remoteAddr = 'testtest';
+        
+        $_SERVER['REMOTE_ADDR'] = $remoteAddr;
+        $_SERVER['PATH_INFO'] = $route;
+        $_SERVER['REQUEST_METHOD'] = $method;
+        
+        $sut = $this->factory
+            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
+            ->type(TypeRequestHunterFactoryBase::REQUEST_OBJECT)
+            ->path('/dir/to/storage')
+            ->build();
+        
+        $this->assertTrue(
+            $sut->getMethod() === $method 
+            && $sut->getRoute() === $route
+            && $sut->getFile() === $this->makeFileName($remoteAddr)
+        );
+    }
+    
+    public function testPrepareToRead()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testPrepareToCount()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testSetDefaultData()
+    {
+        $this->assertTrue(false);
+    }
+    
+    //FileRequestHunterBase 
+    public function testRead()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testWrite()
+    {
+        $this->assertTrue(false);
+    }
+    
+        public function testCreateFile()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testCreateDir()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testGetCount()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testMakeFileName()
+    {
+        $this->assertTrue(false);
+    }
+    
+    public function testMakeDirPath()
+    {
+        $this->assertTrue(false);
     }
 }
