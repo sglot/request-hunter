@@ -1,0 +1,8 @@
+.idea
+.phpcs-cache
+.phpunit.result.cache
+.env
+*.jpg
+*.log
+vendor
+storage
