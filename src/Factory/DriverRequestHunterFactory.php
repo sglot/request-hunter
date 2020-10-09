@@ -19,6 +19,6 @@ class DriverRequestHunterFactory
             return new FileRequestHunterFactory();
         }
 
-        return new FileRequestHunterFactory();
+        return new NullTypeFactory();
     }
 }

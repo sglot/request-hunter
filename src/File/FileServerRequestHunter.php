@@ -31,14 +31,11 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
      */
     public function run()
     {
-        echo '<pre>';
-
         if (! $this->prepareToRead()) {
             return;
         }
 
         $data = $this->read();
-        var_dump($data);
 
         if (! $this->prepareToCount($data)) {
             return;
@@ -82,7 +79,7 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
         return true;
     }
 
-    private function setDefaultData($method, $route): void
+    public function setDefaultData($method, $route): void
     {
         $data = [
             $method => [
