@@ -49,7 +49,7 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
     /**
      * @throws RequestHunterException
      */
-    private function prepareToRead(): bool
+    public function prepareToRead(): bool
     {
         if (! file_exists($this->file)) {
             $this->createDir($this->makeDirPath($_SERVER['REMOTE_ADDR']));
@@ -61,7 +61,7 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
         return true;
     }
 
-    private function prepareToCount(array $data): bool
+    public function prepareToCount(array $data): bool
     {
         if (! isset($data[$this->getMethod()][$this->getRoute()]['count'])) {
             $data = array_merge($data, $default = [
