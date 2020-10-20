@@ -9,7 +9,7 @@ use Tadzumi\RequestHunter\RequestHunterInterface;
  * The class provides collection of information from $ _SERVER
  * and storage of the received data in files.
  */
-final class FileServerRequestHunter extends FileRequestHunterBase implements RequestHunterInterface
+final class FileServerRequestHunter extends FileRequestHunterBase
 {
 
     public function build(): RequestHunterInterface
@@ -31,13 +31,13 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
      */
     public function run()
     {
-        if (! $this->prepareToRead()) {
+        if (! $this->readingPrepare()) {
             return;
         }
 
         $data = $this->read();
 
-        if (! $this->prepareToCount($data)) {
+        if (! $this->countingPrepare($data)) {
             return;
         }
 
@@ -49,7 +49,7 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
     /**
      * @throws RequestHunterException
      */
-    public function prepareToRead(): bool
+    private function readingPrepare(): bool
     {
         if (! file_exists($this->file)) {
             $this->createDir($this->makeDirPath($_SERVER['REMOTE_ADDR']));
@@ -61,7 +61,7 @@ final class FileServerRequestHunter extends FileRequestHunterBase implements Req
         return true;
     }
 
-    public function prepareToCount(array $data): bool
+    private function countingPrepare(array $data): bool
     {
         if (! isset($data[$this->getMethod()][$this->getRoute()]['count'])) {
             $data = array_merge($data, $default = [

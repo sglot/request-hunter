@@ -17,6 +17,10 @@ class FileServerRequestHunterTest extends TestCase
     protected $remoteAddr;
     protected $file;
     protected $defaultData;
+    protected $sut;
+    protected $refClass;
+    protected $refReadingPrepare;
+    protected $refCountingPrepare;
 
     protected function setUp(): void
     {
@@ -39,119 +43,91 @@ class FileServerRequestHunterTest extends TestCase
                 ]
             ]
         ];
-    }
 
-    public function testFileServerRequestHunterBuildCorrectlySetProperties()
-    {
-        $sut = $this->factory
+        $this->sut = $this->factory
             ->driver(DriverRequestHunterFactory::FILE_DRIVER)
             ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
             ->path('/dir/to/storage')
             ->build();
 
+        $this->refClass = new \ReflectionClass(get_class($this->sut));
+        $this->refReadingPrepare = $this->refClass->getMethod('readingPrepare');
+        $this->refReadingPrepare->setAccessible(true);
+
+        $this->refCountingPrepare = $this->refClass->getMethod('countingPrepare');
+        $this->refCountingPrepare->setAccessible(true);
+    }
+
+    public function testFileServerRequestHunterBuildCorrectlySetProperties()
+    {
         $this->assertTrue(
-        $sut->getMethod() === $this->method
-                && $sut->getRoute() === $this->route
-                && $sut->getFile() === $sut->makeFileName($this->remoteAddr)
+            $this->sut->getMethod() === $this->method
+                    && $this->sut->getRoute() === $this->route
+                    && $this->sut->getFile() === $this->sut->makeFileName($this->remoteAddr)
         );
     }
 
-    public function testPrepareToReadWhenFileNotExist()
+    public function testReadingPrepareWhenFileNotExist()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
         $notExistedFile = $this->dir_root . 'storage/rh/testNotExistedFile.php';
-        $sut->setFile($notExistedFile);
-        $preparingResult = $sut->prepareToRead();
+        $this->sut->setFile($notExistedFile);
+
+        $preparingResult = $this->refReadingPrepare->invoke($this->sut);
 
         $this->assertFalse($preparingResult);
 
         TestHelper::rmAll($notExistedFile);
     }
 
-    public function testPrepareToReadMakeDefaultData()
+    public function testReadingPrepareMakeDefaultData()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
         $notExistedFile = $this->dir_root . 'storage/rh/testNotExistedFile.php';
-        $sut->setFile($notExistedFile);
-        $sut->prepareToRead();
-        $dataAfterPrepare = $sut->read();
+        $this->sut->setFile($notExistedFile);
+        $this->refReadingPrepare->invoke($this->sut);
+        $dataAfterPrepare = $this->sut->read();
 
         $this->assertTrue($dataAfterPrepare == $this->defaultData);
 
         TestHelper::rmAll($notExistedFile);
     }
 
-    public function testPrepareToReadWhenFileExist()
+    public function testReadingPrepareWhenFileExist()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
         $existedFile = $this->file;
-        $sut->setFile($existedFile);
-        $sut->createFile();
-        $preparingResult = $sut->prepareToRead();
+        $this->sut->setFile($existedFile);
+        $this->sut->createFile();
+        $preparingResult = $this->refReadingPrepare->invoke($this->sut);
 
         $this->assertTrue($preparingResult);
 
         TestHelper::rmAll($existedFile);
     }
 
-    public function testPrepareToCountOnNotExistRoute()
+    public function testCountingPrepareOnNotExistRoute()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
-        $sut->setFile($this->file);
-        $preparingResult = $sut->prepareToCount([]);
+        $this->sut->setFile($this->file);
+        $preparingResult = $this->refCountingPrepare->invoke($this->sut, []);
 
         $this->assertFalse($preparingResult);
 
         TestHelper::rmAll($this->file);
     }
 
-    public function testPrepareToCountOnExistRoute()
+    public function testCountingPrepareOnExistRoute()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
-        $sut->setFile($this->file);
-        $preparingResult = $sut->prepareToCount($this->defaultData);
+        $this->sut->setFile($this->file);
+        $preparingResult = $this->refCountingPrepare->invoke($this->sut, $this->defaultData);
 
         $this->assertTrue($preparingResult);
 
         TestHelper::rmAll($this->file);
     }
 
-    public function testPrepareToCountMakeDefaultDataOnNotExistRoute()
+    public function testCountingPrepareMakeDefaultDataOnNotExistRoute()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
-        $sut->setFile($this->file);
-        $sut->prepareToCount([]);
-        $dataAfterPrepare = $sut->read();
+        $this->sut->setFile($this->file);
+        $this->refCountingPrepare->invoke($this->sut, []);
+        $dataAfterPrepare = $this->sut->read();
 
         $this->assertTrue($dataAfterPrepare == $this->defaultData);
 
@@ -160,15 +136,9 @@ class FileServerRequestHunterTest extends TestCase
 
     public function testSetDefaultData()
     {
-        $sut = $this->factory
-            ->driver(DriverRequestHunterFactory::FILE_DRIVER)
-            ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)
-            ->path($this->dir_root . 'storage/rh')
-            ->build();
-
-        $sut->setFile($this->file);
-        $sut->setDefaultData($this->method, $this->route);
-        $result = $sut->read();
+        $this->sut->setFile($this->file);
+        $this->sut->setDefaultData($this->method, $this->route);
+        $result = $this->sut->read();
 
         $this->assertTrue($result === $this->defaultData);
 

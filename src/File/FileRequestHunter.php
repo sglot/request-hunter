@@ -3,9 +3,7 @@
 namespace Tadzumi\RequestHunter\File;
 
 
-use Tadzumi\RequestHunter\RequestHunterInterface;
-
-class FileRequestHunter extends FileRequestHunterBase implements RequestHunterInterface
+class FileRequestHunter extends FileRequestHunterBase
 {
     public function run()
     {
