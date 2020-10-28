@@ -1,17 +1,36 @@
-# adaptive app project
-Шаблон адаптивного приложения
+# Request Hunter
 
-#### Стек технологий
-1. PHP - 7.2.22
-2. DB - 10.4.6-MariaDB
+## Описание
+
+**Маленькая** и **лёгкая** библиотека на **PHP 7.2** и выше.
+
+Позволяет собирать информацию о запросах к приложению.
+
+Считает ежедневное количество обращений к серверу группируя по url и типам запросов.
+
+Хранит счётчик запросов в **файлах**.
+
+Собирает информацию из переменной **$_SERVER**
+
+Может использоваться как **middleware**
+
+### Расширение возможностей
+Если вам удобнее получать информацию из объекта Request, то библиотека **расширяется** под ваш формат HttpRequest или CliRequest 
+
+Вы можете написать альтернативную реализацию сохранения собранной информации не в файл а в базу данных.
+
+____
+## Пример 
+
+    // Создаём базовую фабрику
+    $factory = new DriverRequestHunterFactory();
+    
+    $requestHunter = $factory
+        ->driver(DriverRequestHunterFactory::FILE_DRIVER)   // выбираем хранение в файлах
+        ->type(TypeRequestHunterFactoryBase::SERVER_ARRAY)  // собираем информацию из $_SERVER
+        ->path($this->dir_root . 'storage/rh')              // путь к хранилищу относительно корня
+        ->build();                                          // подготовка данных
+        
+    $requestHunter->run();
 
 
-
-***
-
-#### Команды
-1. Запуск миграций `./vendor/bin/doctrine-migrations migrate`
-2. Запуск скрипта `php path/to/web/server/testParser/app/console/script.php`
-3. Проверка кода  `.\vendor\bin\phpcs --standard=Doctrine app/common/HttpClient/HttpClient.php`
-4. Правка кода  `.\vendor\bin\phpcbf --standard=Doctrine app/common/HttpClient/HttpClient.php`
-5. Миграции ОРМ `./vendor/bin/doctrine orm:schema-tool:update --force`

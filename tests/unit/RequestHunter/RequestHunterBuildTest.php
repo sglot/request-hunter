@@ -24,6 +24,11 @@ class RequestHunterBuildTest extends TestCase
         $this->factory = new DriverRequestHunterFactory();
     }
 
+    protected function tearDown(): void
+    {
+        TestHelper::rmAll($this->dir_root . 'storage/rh/' . date('Ymd'));
+    }
+
     public function testReturnRightInterface()
     {
         $sut = $this->factory
