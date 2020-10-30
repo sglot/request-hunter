@@ -3,7 +3,7 @@
 namespace Tadzumi\RequestHunter\File;
 
 
-class FileRequestHunter extends FileRequestHunterBase
+class FileSpecialObjectRequestHunter extends FileRequestHunterBase
 {
     public function run()
     {

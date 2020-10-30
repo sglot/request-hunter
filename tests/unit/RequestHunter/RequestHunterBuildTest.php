@@ -6,7 +6,7 @@ use PHPUnit\Framework\TestCase;
 use Tadzumi\RequestHunter\Factory\DriverRequestHunterFactory;
 use Tadzumi\RequestHunter\Factory\NullTypeFactory;
 use Tadzumi\RequestHunter\Factory\TypeRequestHunterFactoryBase;
-use Tadzumi\RequestHunter\File\FileRequestHunter;
+use Tadzumi\RequestHunter\File\FileSpecialObjectRequestHunter;
 use Tadzumi\RequestHunter\File\FileServerRequestHunter;
 use Tadzumi\RequestHunter\NullRequestHunter;
 use Tadzumi\RequestHunter\RequestHunterInterface;
@@ -59,7 +59,7 @@ class RequestHunterBuildTest extends TestCase
             ->path($this->dir_root . 'storage/rh')
             ->build();
 
-        $this->assertTrue(is_a($sut, FileRequestHunter::class));
+        $this->assertTrue(is_a($sut, FileSpecialObjectRequestHunter::class));
     }
 
     public function testReturnRightClassForNotExistDriver()

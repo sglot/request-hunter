@@ -2,7 +2,7 @@
 
 namespace Tadzumi\RequestHunter\Factory;
 
-use Tadzumi\RequestHunter\File\FileRequestHunter;
+use Tadzumi\RequestHunter\File\FileSpecialObjectRequestHunter;
 use Tadzumi\RequestHunter\File\FileServerRequestHunter;
 use Tadzumi\RequestHunter\NullRequestHunter;
 use Tadzumi\RequestHunter\RequestHunterInterface;
@@ -16,7 +16,7 @@ class FileRequestHunterFactory extends TypeRequestHunterFactoryBase
         }
 
         if ($type === self::REQUEST_OBJECT) {
-            return new FileRequestHunter();
+            return new FileSpecialObjectRequestHunter();
         }
 
         return new NullRequestHunter();

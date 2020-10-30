@@ -5,6 +5,7 @@ namespace Tadzumi\RequestHunter\Factory;
 
 use Tadzumi\RequestHunter\RequestHunterInterface;
 
+
 abstract class TypeRequestHunterFactoryBase
 {
     const SERVER_ARRAY = 'server';
